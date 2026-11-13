@@ -62,6 +62,14 @@
   font-size: 14px;
   color: #526879;
 }
+#nsysu-calendar-embed .calendar-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+#nsysu-calendar-embed .calendar-actions label { margin: 0; white-space: nowrap; }
+#nsysu-calendar-embed .calendar-actions select { width: auto; min-width: 130px; }
 #nsysu-calendar-embed .calendar-reset {
   padding: 7px 14px;
   color: var(--calendar-blue);
@@ -157,7 +165,14 @@
   </div>
   <div class="calendar-tools">
     <span id="nsysu-calendar-count" class="calendar-count" role="status" aria-live="polite">正在讀取活動資料…</span>
-    <button id="nsysu-calendar-reset" class="calendar-reset" type="button">清除篩選</button>
+    <div class="calendar-actions">
+      <label for="nsysu-calendar-language">語言 / Language</label>
+      <select id="nsysu-calendar-language" aria-label="Language">
+        <option value="zh">繁體中文</option>
+        <option value="en">English</option>
+      </select>
+      <button id="nsysu-calendar-reset" class="calendar-reset" type="button">清除篩選</button>
+    </div>
   </div>
   <div class="calendar-table-wrap">
     <table aria-label="學系重要活動日程">
@@ -178,28 +193,79 @@
   if (!root || root.dataset.initialized === "true") return;
   root.dataset.initialized = "true";
   var DATA_URL = "https://bmstweb806.github.io/nsysu-calendar/data/events.json";
-  var fields = [
-    ["date", "活動日期"], ["time", "活動時間"], ["audience", "對象"],
-    ["category", "類別"], ["title", "活動項目"],
-    ["location", "地點"], ["notes", "備註"]
-  ];
+  var fields = ["date", "time", "audience", "category", "title", "location", "notes"];
+  var translations = {
+    zh: {
+      search: "搜尋活動", placeholder: "活動、地點、備註…", audience: "對象",
+      category: "類別", year: "年份", allAudience: "全部對象",
+      allCategory: "全部類別", allYear: "全部年份", clear: "清除篩選",
+      loading: "正在讀取活動資料…", empty: "沒有符合篩選條件的活動",
+      error: "活動資料讀取失敗：", count: function (n,total) { return "共 " + n + " 筆活動（總計 " + total + " 筆）"; },
+      headers: ["活動日期","活動時間","對象","類別","活動項目","地點","備註"]
+    },
+    en: {
+      search: "Search events", placeholder: "Event, venue, notes…", audience: "Audience",
+      category: "Category", year: "Year", allAudience: "All audiences",
+      allCategory: "All categories", allYear: "All years", clear: "Clear filters",
+      loading: "Loading events…", empty: "No matching events",
+      error: "Unable to load events: ", count: function (n,total) { return n + " events (total " + total + ")"; },
+      headers: ["Date","Time","Audience","Category","Event","Venue","Notes"]
+    }
+  };
+  var params = new URLSearchParams(window.location.search);
+  var requestedLanguage = params.get("Lang") || params.get("lang") || "";
+  var language = /^en([_-]|$)/i.test(requestedLanguage) ? "en" : "zh";
   var allEvents = [];
-  function node(id) { return document.getElementById("nsysu-calendar-" + id); }
+  function node(id) { return root.querySelector("#nsysu-calendar-" + id); }
+  function textFor(event, key) {
+    if (language === "en" && ["audience","category","title","location","notes"].includes(key)) {
+      var en = String(event[key + "_en"] || "").trim();
+      if (en) return en;
+    }
+    return String(event[key] || "");
+  }
+  function labels() { return translations[language]; }
+  function applyLanguage() {
+    var t = labels();
+    root.setAttribute("lang", language === "en" ? "en" : "zh-Hant");
+    node("language").value = language;
+    root.querySelector('label[for="nsysu-calendar-q"]').textContent = t.search;
+    node("q").placeholder = t.placeholder;
+    root.querySelector('label[for="nsysu-calendar-audience"]').textContent = t.audience;
+    root.querySelector('label[for="nsysu-calendar-category"]').textContent = t.category;
+    root.querySelector('label[for="nsysu-calendar-year"]').textContent = t.year;
+    node("reset").textContent = t.clear;
+    var th = root.querySelectorAll("thead th");
+    t.headers.forEach(function (h,i) { if (th[i]) th[i].textContent = h; });
+    refreshOptions();
+    render();
+  }
   function dateText(value) {
     var s = String(value || "");
     if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
     var weekday = new Date(s + "T00:00:00Z").getUTCDay();
     return s.replace(/-/g, " / ") + " (" + "日一二三四五六".charAt(weekday) + ")";
   }
-  function addOptions(id, items) {
+  function addOptions(id, items, allLabel) {
+    var select=node(id), current=select.value;
+    select.replaceChildren();
+    var first=document.createElement("option");
+    first.value=""; first.textContent=allLabel; select.appendChild(first);
     var values = Array.from(new Set(items.filter(Boolean)));
-    values.sort(function (a, b) { return a.localeCompare(b, "zh-Hant"); });
+    values.sort(function (a, b) { return a.localeCompare(b, language === "en" ? "en" : "zh-Hant"); });
     values.forEach(function (value) {
       var option = document.createElement("option");
       option.value = value;
       option.textContent = value;
-      node(id).appendChild(option);
+      select.appendChild(option);
     });
+    if(values.includes(current))select.value=current;
+  }
+  function refreshOptions(){
+    var t=labels();
+    addOptions("audience",allEvents.map(function(e){return textFor(e,"audience");}),t.allAudience);
+    addOptions("category",allEvents.map(function(e){return textFor(e,"category");}),t.allCategory);
+    addOptions("year",allEvents.map(function(e){return String(e.date||"").slice(0,4);}),t.allYear);
   }
   function render() {
     var term = node("q").value.trim().toLocaleLowerCase();
@@ -208,14 +274,14 @@
     var year = node("year").value;
     // filter() 保留原始順序，不進行日期或 ID 排序。
     var shown = allEvents.filter(function (event) {
-      return (!audience || event.audience === audience) &&
-        (!category || event.category === category) &&
+      return (!audience || textFor(event,"audience") === audience) &&
+        (!category || textFor(event,"category") === category) &&
         (!year || String(event.date).slice(0, 4) === year) &&
-        (!term || fields.some(function (field) {
-          return String(event[field[0]] || "").toLocaleLowerCase().includes(term);
+        (!term || fields.some(function (key) {
+          return textFor(event,key).toLocaleLowerCase().includes(term);
         }));
     });
-    node("count").textContent = "共 " + shown.length + " 筆活動（總計 " + allEvents.length + " 筆）";
+    node("count").textContent = labels().count(shown.length, allEvents.length);
     var body = node("rows");
     body.replaceChildren();
     if (!shown.length) {
@@ -223,24 +289,23 @@
       var emptyCell = document.createElement("td");
       emptyCell.colSpan = 7;
       emptyCell.className = "calendar-empty";
-      emptyCell.textContent = "沒有符合篩選條件的活動";
+      emptyCell.textContent = labels().empty;
       emptyRow.appendChild(emptyCell);
       body.appendChild(emptyRow);
       return;
     }
     shown.forEach(function (event) {
       var row = document.createElement("tr");
-      fields.forEach(function (field) {
-        var key = field[0], label = field[1];
+      fields.forEach(function (key,i) {
         var cell = document.createElement("td");
-        cell.setAttribute("data-label", label);
-        cell.textContent = key === "date" ? dateText(event.date) : String(event[key] || "");
+        cell.setAttribute("data-label", labels().headers[i]);
+        cell.textContent = key === "date" ? dateText(event.date) : textFor(event,key);
         if (key === "title" && /^https:\/\//i.test(String(event.url || ""))) {
           var anchor = document.createElement("a");
           anchor.href = event.url;
           anchor.target = "_blank";
           anchor.rel = "noopener noreferrer";
-          anchor.textContent = String(event.title || "查看活動");
+          anchor.textContent = textFor(event,"title") || (language==="en"?"Details":"查看活動");
           cell.replaceChildren(anchor);
         }
         row.appendChild(cell);
@@ -255,18 +320,22 @@
     ["q", "audience", "category", "year"].forEach(function (id) { node(id).value = ""; });
     render();
   });
+  node("language").addEventListener("change",function(){
+    language=node("language").value;
+    node("audience").value="";
+    node("category").value="";
+    applyLanguage();
+  });
+  node("language").value=language;
   fetch(DATA_URL, { cache: "no-cache" }).then(function (response) {
     if (!response.ok) throw new Error("HTTP " + response.status);
     return response.json();
   }).then(function (data) {
     if (!data || !Array.isArray(data.events)) throw new Error("JSON 格式不符");
     allEvents = data.events.filter(function (event) { return event && event.date && event.title; });
-    addOptions("audience", allEvents.map(function (event) { return String(event.audience || ""); }));
-    addOptions("category", allEvents.map(function (event) { return String(event.category || ""); }));
-    addOptions("year", allEvents.map(function (event) { return String(event.date).slice(0, 4); }));
-    render();
+    applyLanguage();
   }).catch(function (error) {
-    node("count").textContent = "活動資料讀取失敗：" + error.message;
+    node("count").textContent = labels().error + error.message;
     node("rows").replaceChildren();
   });
 }());
