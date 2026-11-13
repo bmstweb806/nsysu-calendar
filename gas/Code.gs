@@ -1,6 +1,6 @@
 /**
  * 國立中山大學｜護理學系活動日程 → GitHub Pages JSON
- * 來源：目前這份 Google Sheet（綁定型 Apps Script）
+ * 來源：目前這份 Google Sheet（綁定型 Apps Script）；中英欄位共用一筆活動。
  * 需求：指令碼屬性 GITHUB_TOKEN，Contents: Read and write，僅限指定 repository。
  */
 const CONFIG = Object.freeze({
@@ -13,7 +13,9 @@ const CONFIG = Object.freeze({
 const FIELD = Object.freeze({
   date:'活動日期', time:'活動時間', audience:'對象', category:'類別',
   title:'活動項目', location:'地點', notes:'備註', url:'活動連結',
-  published:'是否發布'
+  published:'是否發布',
+  audienceEn:'對象（英文）', categoryEn:'類別（英文）', titleEn:'活動項目（英文）',
+  locationEn:'地點（英文）', notesEn:'備註（英文）'
 });
 
 function onOpen() {
@@ -61,13 +63,18 @@ function getEventPayload_() {
       // 不需要 ID 欄位：依實際試算表列號自動產生，並保留原始列順序。
       // 移動或刪除列後，對應的 ID 也會重新編排。
       const id='row-'+String(r+1).padStart(4,'0');
-      events.push({id,date,time:get('time'),audience:get('audience'),category:get('category'),
-        title,location:get('location'),notes:get('notes'),url});
+      events.push({
+        id,date,time:get('time'),
+        audience:get('audience'),category:get('category'),
+        title,location:get('location'),notes:get('notes'),url,
+        audience_en:get('audienceEn'),category_en:get('categoryEn'),
+        title_en:get('titleEn'),location_en:get('locationEn'),notes_en:get('notesEn')
+      });
     } catch(e) { errors.push('第 '+(r+1)+' 列：'+e.message); }
   }
   if (errors.length) throw new Error('發布前請修正：\n'+errors.join('\n'));
   // 不額外排序：events 的順序即 Google Sheet 中由上而下的列順序。
-  return {schema_version:1,published_at:new Date().toISOString(),events};
+  return {schema_version:2,published_at:new Date().toISOString(),events};
 }
 function validateEvents() {
   try { const payload=getEventPayload_();SpreadsheetApp.getUi().alert('檢查完成：'+payload.events.length+' 筆資料可發布。'); }
