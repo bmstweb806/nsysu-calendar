@@ -27,10 +27,11 @@ https://docs.google.com/spreadsheets/d/1fzyEAfJw1BsyWRvVrF1VnCmQQPseMoqLOjY_3RvB
 9. 在 RPage HTML 區塊貼入 `rpage-events-embed.html` 的內容，或先貼單純的 iframe 測試環境限制。
 
 ## 維護規則
-- 一列一筆；活動 ID 不可重複，編輯時不要改 ID。
+- 一列一筆；不需維護「顯示順序」和「活動ID」欄位。
 - 日期為 `YYYY-MM-DD`，活動時間可填 `1600-1800` 或 `16:00–18:00`。
 - 「是否發布」填 **是** 才會輸出，填 **否** 會保留於試算表但不發布。
-- 網頁按日期及「顯示順序」排序，Google Sheet 的列順序不影響網站。
+- 網頁**完全依照 Google Sheet 工作表的列順序**呈現，不按日期重新排序。調整順序請移動整列，然後重新發布。
+- JSON 中的 `id` 由 GAS 根據目前的實際列號自動產生，例如第 2 列是 `row-0002`。移動、插入或刪除列時，ID 會跟著改變；請勿將它視為永久不變的活動識別碼。
 - GAS 只會覆蓋 `data/events.json`，不會修改其他網頁。
 - 網站已存在一份初始 JSON；之後每次要反映新資料，都要按 **發布正式 JSON**。
 - 如果 RPage 不允許執行 script，高度自動調整可能失效；可只用 iframe 固定高度。
