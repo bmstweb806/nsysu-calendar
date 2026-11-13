@@ -41,7 +41,7 @@ const $=id=>document.getElementById(id);
 const fields=[['date','活動日期'],['time','活動時間'],['audience','對象'],['category','類別'],['title','活動項目'],['location','地點'],['notes','備註']];
 let events=[];
 const dateText=s=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(s||''))return s||'';const d=new Date(s+'T12:00:00+08:00');return s.replace(/-/g,' / ')+' ('+'日一二三四五六'[d.getDay()]+')'};
-const sortEvents=(a,b)=>String(a.date).localeCompare(String(b.date))||(Number(a.sort_order)||0)-(Number(b.sort_order)||0)||String(a.id).localeCompare(String(b.id));
+// 活動依照 JSON 原始順序顯示（與 Google Sheet 的列順序相同）。
 function makeOptions(id,values){for(const value of [...new Set(values.filter(Boolean))].sort((a,b)=>a.localeCompare(b,'zh-Hant'))){const el=document.createElement('option');el.value=value;el.textContent=value;$(id).append(el)}}
 function render(){
  const term=$('q').value.trim().toLocaleLowerCase();
@@ -59,7 +59,7 @@ $('reset').addEventListener('click',()=>{for(const id of ['q','audience','catego
 async function load(){
  try{const response=await fetch('./data/events.json',{cache:'no-cache'});if(!response.ok)throw new Error('HTTP '+response.status);
  const result=await response.json();if(!Array.isArray(result.events))throw new Error('JSON 格式不符');
- events=result.events.filter(e=>e&&e.date&&e.title).sort(sortEvents);
+ events=result.events.filter(e=>e&&e.date&&e.title);
  makeOptions('audience',events.map(x=>x.audience));makeOptions('category',events.map(x=>x.category));makeOptions('year',events.map(x=>String(x.date).slice(0,4)));render()
  }catch(err){$('count').textContent='資料載入失敗：'+err.message;$('rows').replaceChildren();syncHeight()}
 }
