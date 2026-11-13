@@ -7,7 +7,7 @@
 - `events.html`：活動表格（搜尋、對象/類別/年份篩選、響應式）。
 - `data/events.json`：目前已發布的活動快照，前端讀取此檔。
 - `gas/Code.gs`：貼到該 Google Sheet 的「擴充功能 → Apps Script」。
-- `rpage-events-embed.html`：單檔包含 `<style>`、HTML、`<script>`；無 iframe、無標題，直接貼入 RPage HTML 原始碼區塊。
+- `rpage-events-embed.html`：包含 `<style>`、HTML、`<script>` 的雙語嵌入檔；無 iframe、無標題，可直接貼到 RPage HTML 區塊。
 
 ## 資料來源
 Google Sheet：
@@ -30,8 +30,12 @@ https://docs.google.com/spreadsheets/d/1fzyEAfJw1BsyWRvVrF1VnCmQQPseMoqLOjY_3RvB
 - 一列一筆；不需維護「顯示順序」和「活動ID」欄位。
 - 日期為 `YYYY-MM-DD`，活動時間可填 `1600-1800` 或 `16:00–18:00`。
 - 「是否發布」填 **是** 才會輸出，填 **否** 會保留於試算表但不發布。
+- 同一筆活動的 A:I 是既有中文資料與發布設定；J:N 是英文「對象／類別／活動項目／地點／備註」。日期、時間與連結共用。
+- 英文內容為初步翻譯草稿，正式對外發布前請由系所確認。若英文欄位留空，英文網頁會以中文原文作為備援。
 - 網頁**完全依照 Google Sheet 工作表的列順序**呈現，不按日期重新排序。調整順序請移動整列，然後重新發布。
 - JSON 中的 `id` 由 GAS 根據目前的實際列號自動產生，例如第 2 列是 `row-0002`。移動、插入或刪除列時，ID 會跟著改變；請勿將它視為永久不變的活動識別碼。
 - GAS 只會覆蓋 `data/events.json`，不會修改其他網頁。
 - 網站已存在一份初始 JSON；之後每次要反映新資料，都要按 **發布正式 JSON**。
 - RPage 需允許 `<style>`、`<script>` 與跨站 `fetch()`；若平台移除 script，資料便無法載入，需調整 RPage 編輯權限或嵌入方式。
+- **雙語自動切換**：RPage 中文網址加 `?Lang=zh-tw`，英文網址加 `?Lang=en`；嵌入程式依該網址參數切換表格、篩選介面與活動內容，亦提供手動語言選單。
+- 獨立頁面也支援 `https://bmstweb806.github.io/nsysu-calendar/events.html?Lang=en`。
