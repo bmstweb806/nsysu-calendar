@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "published_at": "2026-11-13T16:06:18.325Z",
   "events": [
     {
@@ -11,7 +11,12 @@
       "title": "115學年度新生課程說明會",
       "location": "視訊",
       "notes": "連結另行通知",
-      "url": ""
+      "url": "",
+      "audience_en": "First-year Nursing Students",
+      "category_en": "Student Support",
+      "title_en": "New Student Course Orientation (Academic Year 2026–2027)",
+      "location_en": "Online",
+      "notes_en": "Meeting link to be announced"
     },
     {
       "id": "row-0003",
@@ -22,7 +27,11 @@
       "title": "系學會迎新_學長姐/學弟妹直屬選定",
       "location": "圖資3樓IL3017",
       "notes": "",
-      "url": ""
+      "url": "",
+      "audience_en": "All Nursing Students",
+      "category_en": "Events",
+      "title_en": "Student Association Welcome Event and Mentor–Mentee Matching",
+      "location_en": "Library and Information Building, 3F, Room IL3017"
     },
     {
       "id": "row-0004",
@@ -33,7 +42,12 @@
       "title": "本校 115 學年度新生體檢",
       "location": "圖資大樓後門",
       "notes": "以校方正式通知為準",
-      "url": ""
+      "url": "",
+      "audience_en": "First-year Nursing Students",
+      "category_en": "Other",
+      "title_en": "University New Student Health Examination (2026–2027)",
+      "location_en": "Rear Entrance, Library and Information Building",
+      "notes_en": "Refer to the university's official announcement"
     },
     {
       "id": "row-0005",
@@ -44,7 +58,12 @@
       "title": "本系 115 學年度新生迎新",
       "location": "圖資3樓IL3017",
       "notes": "務必參加",
-      "url": ""
+      "url": "",
+      "audience_en": "First-year Nursing Students",
+      "category_en": "Student Support",
+      "title_en": "Department New Student Orientation (2026–2027)",
+      "location_en": "Library and Information Building, 3F, Room IL3017",
+      "notes_en": "Attendance required"
     },
     {
       "id": "row-0006",
@@ -55,7 +74,12 @@
       "title": "本校 115 學年度新生迎新",
       "location": "依校方通知為準",
       "notes": "務必參加",
-      "url": ""
+      "url": "",
+      "audience_en": "First-year Nursing Students",
+      "category_en": "Events",
+      "title_en": "University New Student Orientation (2026–2027)",
+      "location_en": "As announced by the university",
+      "notes_en": "Attendance required"
     },
     {
       "id": "row-0007",
@@ -66,7 +90,12 @@
       "title": "護生實習前說明會 (說明實習的單位組別、各醫院的配合規定以及資料收集)",
       "location": "圖資3樓IL3005",
       "notes": "務必參加",
-      "url": ""
+      "url": "",
+      "audience_en": "Second-year Nursing Students",
+      "category_en": "Courses",
+      "title_en": "Pre-clinical Practicum Briefing (Group Assignments, Hospital Requirements, and Data Collection)",
+      "location_en": "Library and Information Building, 3F, Room IL3005",
+      "notes_en": "Attendance required"
     },
     {
       "id": "row-0008",
@@ -77,7 +106,12 @@
       "title": "解剖學與臨床應用",
       "location": "圖資3樓IL3017",
       "notes": "9/17調課至9/14及9/21第1-2節，務必參加",
-      "url": ""
+      "url": "",
+      "audience_en": "First-year Nursing Students",
+      "category_en": "Courses",
+      "title_en": "Anatomy and Clinical Applications",
+      "location_en": "Library and Information Building, 3F, Room IL3017",
+      "notes_en": "The Sep 17 class is rescheduled to periods 1–2 on Sep 14 and Sep 21. Attendance required"
     },
     {
       "id": "row-0009",
@@ -88,7 +122,12 @@
       "title": "護生實習前健康檢查",
       "location": "圖資大樓後門",
       "notes": "務必參加",
-      "url": ""
+      "url": "",
+      "audience_en": "Second-year Nursing Students",
+      "category_en": "Courses",
+      "title_en": "Pre-practicum Health Examination for Nursing Students",
+      "location_en": "Rear Entrance, Library and Information Building",
+      "notes_en": "Attendance required"
     },
     {
       "id": "row-0010",
@@ -99,7 +138,12 @@
       "title": "解剖學與臨床應用",
       "location": "圖資3樓IL3017",
       "notes": "9/17調課至9/14及9/21第1-2節，務必參加",
-      "url": ""
+      "url": "",
+      "audience_en": "First-year Nursing Students",
+      "category_en": "Courses",
+      "title_en": "Anatomy and Clinical Applications",
+      "location_en": "Library and Information Building, 3F, Room IL3017",
+      "notes_en": "The Sep 17 class is rescheduled to periods 1–2 on Sep 14 and Sep 21. Attendance required"
     },
     {
       "id": "row-0011",
@@ -110,7 +154,12 @@
       "title": "跨文化照護與靈性護理成果發表會",
       "location": "圖資3樓IL3017",
       "notes": "自由參加",
-      "url": ""
+      "url": "",
+      "audience_en": "All Nursing Students",
+      "category_en": "Events",
+      "title_en": "Presentation of Outcomes in Transcultural Care and Spiritual Nursing",
+      "location_en": "Library and Information Building, 3F, Room IL3017",
+      "notes_en": "Optional attendance"
     },
     {
       "id": "row-0012",
@@ -121,7 +170,12 @@
       "title": "加冠及傳光典禮",
       "location": "海科院三樓演講廳",
       "notes": "務必參加",
-      "url": ""
+      "url": "",
+      "audience_en": "All Nursing Students",
+      "category_en": "Events",
+      "title_en": "Capping and Candle Lighting Ceremony",
+      "location_en": "College of Marine Sciences, 3F Lecture Hall",
+      "notes_en": "Attendance required"
     },
     {
       "id": "row-0013",
@@ -132,7 +186,12 @@
       "title": "一年級主任有約",
       "location": "圖資3樓IL3005",
       "notes": "務必參加",
-      "url": ""
+      "url": "",
+      "audience_en": "First-year Nursing Students",
+      "category_en": "Student Support",
+      "title_en": "Meet the Department Chair — First-year Students",
+      "location_en": "Library and Information Building, 3F, Room IL3005",
+      "notes_en": "Attendance required"
     },
     {
       "id": "row-0014",
@@ -143,7 +202,12 @@
       "title": "實習前環境安全說明會 (性別平等教育與職場暴力演講)",
       "location": "圖資3樓IL3005",
       "notes": "務必參加",
-      "url": ""
+      "url": "",
+      "audience_en": "Second-year Nursing Students",
+      "category_en": "Courses",
+      "title_en": "Pre-practicum Safety Briefing (Gender Equality Education and Workplace Violence)",
+      "location_en": "Library and Information Building, 3F, Room IL3005",
+      "notes_en": "Attendance required"
     },
     {
       "id": "row-0015",
@@ -154,7 +218,12 @@
       "title": "二年級主任有約",
       "location": "圖資3樓IL3005",
       "notes": "務必參加",
-      "url": ""
+      "url": "",
+      "audience_en": "Second-year Nursing Students",
+      "category_en": "Student Support",
+      "title_en": "Meet the Department Chair — Second-year Students",
+      "location_en": "Library and Information Building, 3F, Room IL3005",
+      "notes_en": "Attendance required"
     },
     {
       "id": "row-0016",
@@ -165,7 +234,12 @@
       "title": "實習前環境安全說明會 (針扎、交通安全及學生獎懲辦法規定)",
       "location": "圖資3樓IL3005",
       "notes": "務必參加",
-      "url": ""
+      "url": "",
+      "audience_en": "Second-year Nursing Students",
+      "category_en": "Courses",
+      "title_en": "Pre-practicum Safety Briefing (Needlestick Injuries, Traffic Safety, and Student Conduct Regulations)",
+      "location_en": "Library and Information Building, 3F, Room IL3005",
+      "notes_en": "Attendance required"
     }
   ]
 }
