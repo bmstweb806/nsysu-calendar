@@ -1,18 +1,273 @@
-<!-- 貼在 RPage HTML 原始碼區塊（需允許 iframe 與 script） -->
-<iframe id="nsysu-events-frame"
-  src="https://bmstweb806.github.io/nsysu-calendar/events.html"
-  title="學系重要活動日程"
-  loading="lazy"
-  style="width:100%;height:850px;border:0;display:block"
-></iframe>
-<script>
-window.addEventListener('message',function(event){
-  if(event.origin!=='https://bmstweb806.github.io')return;
-  if(event.data&&event.data.type==='NSYSU_EVENTS_HEIGHT'){
-    const frame=document.getElementById('nsysu-events-frame');
-    if(frame&&event.source===frame.contentWindow&&Number.isFinite(event.data.height)){
-      frame.style.height=Math.max(300,Math.min(event.data.height,25000))+'px';
-    }
+<!--
+  國立中山大學活動日程｜RPage 直接嵌入版
+  整份內容直接貼進 RPage 的 HTML 原始碼編輯區。
+  本檔自帶 CSS + HTML + JavaScript，無 iframe、無頁面標題。
+  須允許 <style>、<script> 與跨網域 fetch。
+-->
+<style>
+#nsysu-calendar-embed {
+  --calendar-blue: #174f72;
+  --calendar-line: #dce5ed;
+  --calendar-ink: #273845;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  color: var(--calendar-ink);
+  font: 16px/1.7 Arial, "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+}
+#nsysu-calendar-embed,
+#nsysu-calendar-embed * { box-sizing: border-box; }
+#nsysu-calendar-embed .calendar-filters {
+  display: grid;
+  grid-template-columns: 1.7fr 1fr 1fr 1fr;
+  gap: 12px;
+  margin: 0 0 12px;
+}
+#nsysu-calendar-embed label {
+  display: block;
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 700;
+}
+#nsysu-calendar-embed input,
+#nsysu-calendar-embed select,
+#nsysu-calendar-embed button {
+  font: inherit;
+}
+#nsysu-calendar-embed input,
+#nsysu-calendar-embed select {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  color: inherit;
+  background: #fff;
+  border: 1px solid #b8c8d3;
+  border-radius: 5px;
+}
+#nsysu-calendar-embed input:focus-visible,
+#nsysu-calendar-embed select:focus-visible,
+#nsysu-calendar-embed button:focus-visible {
+  outline: 3px solid #8ac4e6;
+  outline-offset: 2px;
+}
+#nsysu-calendar-embed .calendar-tools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 12px;
+}
+#nsysu-calendar-embed .calendar-count {
+  font-size: 14px;
+  color: #526879;
+}
+#nsysu-calendar-embed .calendar-reset {
+  padding: 7px 14px;
+  color: var(--calendar-blue);
+  background: #fff;
+  border: 1px solid #aec3d2;
+  border-radius: 5px;
+  cursor: pointer;
+}
+#nsysu-calendar-embed .calendar-table-wrap { overflow-x: auto; }
+#nsysu-calendar-embed table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+#nsysu-calendar-embed th,
+#nsysu-calendar-embed td {
+  padding: 11px 10px;
+  border: 1px solid var(--calendar-line);
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+#nsysu-calendar-embed th {
+  background: #e9f1f6;
+  color: #173e58;
+  font-weight: 700;
+  white-space: nowrap;
+}
+#nsysu-calendar-embed tbody tr:nth-child(even) { background: #f8fafc; }
+#nsysu-calendar-embed th:nth-child(1) { min-width: 148px; }
+#nsysu-calendar-embed th:nth-child(2) { min-width: 105px; }
+#nsysu-calendar-embed th:nth-child(3) { min-width: 105px; }
+#nsysu-calendar-embed th:nth-child(4) { min-width: 72px; }
+#nsysu-calendar-embed th:nth-child(5) { min-width: 255px; }
+#nsysu-calendar-embed th:nth-child(6) { min-width: 135px; }
+#nsysu-calendar-embed th:nth-child(7) { min-width: 195px; }
+#nsysu-calendar-embed a { color: #12608c; }
+#nsysu-calendar-embed .calendar-empty {
+  text-align: center;
+  padding: 26px 12px;
+  color: #64798a;
+}
+@media (max-width: 760px) {
+  #nsysu-calendar-embed .calendar-filters { grid-template-columns: 1fr 1fr; }
+  #nsysu-calendar-embed .calendar-search { grid-column: 1 / -1; }
+  #nsysu-calendar-embed .calendar-table-wrap { overflow: visible; }
+  #nsysu-calendar-embed table,
+  #nsysu-calendar-embed tbody,
+  #nsysu-calendar-embed tr,
+  #nsysu-calendar-embed td { display: block; width: 100%; }
+  #nsysu-calendar-embed thead { display: none; }
+  #nsysu-calendar-embed tbody { display: grid; gap: 12px; }
+  #nsysu-calendar-embed tbody tr {
+    padding: 12px;
+    background: #fff !important;
+    border: 1px solid var(--calendar-line);
+    border-left: 4px solid var(--calendar-blue);
+    border-radius: 7px;
   }
-});
+  #nsysu-calendar-embed td {
+    display: grid;
+    grid-template-columns: 85px minmax(0, 1fr);
+    gap: 12px;
+    padding: 5px 0;
+    border: 0;
+  }
+  #nsysu-calendar-embed td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: #47647a;
+  }
+}
+</style>
+
+<div id="nsysu-calendar-embed">
+  <div class="calendar-filters">
+    <div class="calendar-search">
+      <label for="nsysu-calendar-q">搜尋活動</label>
+      <input id="nsysu-calendar-q" type="search" placeholder="活動、地點、備註…">
+    </div>
+    <div>
+      <label for="nsysu-calendar-audience">對象</label>
+      <select id="nsysu-calendar-audience"><option value="">全部對象</option></select>
+    </div>
+    <div>
+      <label for="nsysu-calendar-category">類別</label>
+      <select id="nsysu-calendar-category"><option value="">全部類別</option></select>
+    </div>
+    <div>
+      <label for="nsysu-calendar-year">年份</label>
+      <select id="nsysu-calendar-year"><option value="">全部年份</option></select>
+    </div>
+  </div>
+  <div class="calendar-tools">
+    <span id="nsysu-calendar-count" class="calendar-count" role="status" aria-live="polite">正在讀取活動資料…</span>
+    <button id="nsysu-calendar-reset" class="calendar-reset" type="button">清除篩選</button>
+  </div>
+  <div class="calendar-table-wrap">
+    <table aria-label="學系重要活動日程">
+      <thead><tr>
+        <th scope="col">活動日期</th><th scope="col">活動時間</th>
+        <th scope="col">對象</th><th scope="col">類別</th>
+        <th scope="col">活動項目</th><th scope="col">地點</th><th scope="col">備註</th>
+      </tr></thead>
+      <tbody id="nsysu-calendar-rows"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var root = document.getElementById("nsysu-calendar-embed");
+  if (!root || root.dataset.initialized === "true") return;
+  root.dataset.initialized = "true";
+  var DATA_URL = "https://bmstweb806.github.io/nsysu-calendar/data/events.json";
+  var fields = [
+    ["date", "活動日期"], ["time", "活動時間"], ["audience", "對象"],
+    ["category", "類別"], ["title", "活動項目"],
+    ["location", "地點"], ["notes", "備註"]
+  ];
+  var allEvents = [];
+  function node(id) { return document.getElementById("nsysu-calendar-" + id); }
+  function dateText(value) {
+    var s = String(value || "");
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+    var weekday = new Date(s + "T00:00:00Z").getUTCDay();
+    return s.replace(/-/g, " / ") + " (" + "日一二三四五六".charAt(weekday) + ")";
+  }
+  function addOptions(id, items) {
+    var values = Array.from(new Set(items.filter(Boolean)));
+    values.sort(function (a, b) { return a.localeCompare(b, "zh-Hant"); });
+    values.forEach(function (value) {
+      var option = document.createElement("option");
+      option.value = value;
+      option.textContent = value;
+      node(id).appendChild(option);
+    });
+  }
+  function render() {
+    var term = node("q").value.trim().toLocaleLowerCase();
+    var audience = node("audience").value;
+    var category = node("category").value;
+    var year = node("year").value;
+    // filter() 保留原始順序，不進行日期或 ID 排序。
+    var shown = allEvents.filter(function (event) {
+      return (!audience || event.audience === audience) &&
+        (!category || event.category === category) &&
+        (!year || String(event.date).slice(0, 4) === year) &&
+        (!term || fields.some(function (field) {
+          return String(event[field[0]] || "").toLocaleLowerCase().includes(term);
+        }));
+    });
+    node("count").textContent = "共 " + shown.length + " 筆活動（總計 " + allEvents.length + " 筆）";
+    var body = node("rows");
+    body.replaceChildren();
+    if (!shown.length) {
+      var emptyRow = document.createElement("tr");
+      var emptyCell = document.createElement("td");
+      emptyCell.colSpan = 7;
+      emptyCell.className = "calendar-empty";
+      emptyCell.textContent = "沒有符合篩選條件的活動";
+      emptyRow.appendChild(emptyCell);
+      body.appendChild(emptyRow);
+      return;
+    }
+    shown.forEach(function (event) {
+      var row = document.createElement("tr");
+      fields.forEach(function (field) {
+        var key = field[0], label = field[1];
+        var cell = document.createElement("td");
+        cell.setAttribute("data-label", label);
+        cell.textContent = key === "date" ? dateText(event.date) : String(event[key] || "");
+        if (key === "title" && /^https:\/\//i.test(String(event.url || ""))) {
+          var anchor = document.createElement("a");
+          anchor.href = event.url;
+          anchor.target = "_blank";
+          anchor.rel = "noopener noreferrer";
+          anchor.textContent = String(event.title || "查看活動");
+          cell.replaceChildren(anchor);
+        }
+        row.appendChild(cell);
+      });
+      body.appendChild(row);
+    });
+  }
+  ["q", "audience", "category", "year"].forEach(function (id) {
+    node(id).addEventListener(id === "q" ? "input" : "change", render);
+  });
+  node("reset").addEventListener("click", function () {
+    ["q", "audience", "category", "year"].forEach(function (id) { node(id).value = ""; });
+    render();
+  });
+  fetch(DATA_URL, { cache: "no-cache" }).then(function (response) {
+    if (!response.ok) throw new Error("HTTP " + response.status);
+    return response.json();
+  }).then(function (data) {
+    if (!data || !Array.isArray(data.events)) throw new Error("JSON 格式不符");
+    allEvents = data.events.filter(function (event) { return event && event.date && event.title; });
+    addOptions("audience", allEvents.map(function (event) { return String(event.audience || ""); }));
+    addOptions("category", allEvents.map(function (event) { return String(event.category || ""); }));
+    addOptions("year", allEvents.map(function (event) { return String(event.date).slice(0, 4); }));
+    render();
+  }).catch(function (error) {
+    node("count").textContent = "活動資料讀取失敗：" + error.message;
+    node("rows").replaceChildren();
+  });
+}());
 </script>
