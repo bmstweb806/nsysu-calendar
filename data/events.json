@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "published_at": "2026-11-13T16:06:18.325Z",
+  "published_at": "2026-11-13T17:10:44.396Z",
   "events": [
     {
       "id": "row-0002",
@@ -31,7 +31,8 @@
       "audience_en": "All Nursing Students",
       "category_en": "Events",
       "title_en": "Student Association Welcome Event and Mentor–Mentee Matching",
-      "location_en": "Library and Information Building, 3F, Room IL3017"
+      "location_en": "Library and Information Building, 3F, Room IL3017",
+      "notes_en": ""
     },
     {
       "id": "row-0004",
