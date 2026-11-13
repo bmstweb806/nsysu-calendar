@@ -13,7 +13,7 @@ const CONFIG = Object.freeze({
 const FIELD = Object.freeze({
   date:'活動日期', time:'活動時間', audience:'對象', category:'類別',
   title:'活動項目', location:'地點', notes:'備註', url:'活動連結',
-  published:'是否發布', sort:'顯示順序', id:'活動ID'
+  published:'是否發布'
 });
 
 function onOpen() {
@@ -47,27 +47,26 @@ function getEventPayload_() {
   const required=Object.values(FIELD), missing=required.filter(x=>!headers.includes(x));
   if (missing.length) throw new Error('缺少欄位：'+missing.join('、'));
   const index=Object.fromEntries(headers.map((h,i)=>[h,i]));
-  const errors=[], usedIds=new Set(), events=[];
+  const errors=[], events=[];
   for (let r=1;r<display.length;r++) {
     const get=key=>String(display[r][index[FIELD[key]]]||'').trim();
     if (!display[r].some(v=>String(v).trim())) continue;
     const published=get('published').toLowerCase();
     if (!['是','yes','true','1'].includes(published)) continue;
     try {
-      const id=get('id'), title=get('title'), date=normalizeDate_(actual[r][index[FIELD.date]],get('date'));
-      if (!id || !title) throw new Error('活動ID、活動項目不可空白');
-      if (usedIds.has(id)) throw new Error('活動ID 重複：'+id);
-      usedIds.add(id);
+      const title=get('title'), date=normalizeDate_(actual[r][index[FIELD.date]],get('date'));
+      if (!title) throw new Error('活動項目不可空白');
       const url=get('url');
       if (url && !/^https:\/\//i.test(url)) throw new Error('活動連結須使用 https://');
-      const order=Number(get('sort')||0);
-      if (!Number.isFinite(order)) throw new Error('顯示順序必須是數字');
+      // 不需要 ID 欄位：依實際試算表列號自動產生，並保留原始列順序。
+      // 移動或刪除列後，對應的 ID 也會重新編排。
+      const id='row-'+String(r+1).padStart(4,'0');
       events.push({id,date,time:get('time'),audience:get('audience'),category:get('category'),
-        title,location:get('location'),notes:get('notes'),url,sort_order:order});
+        title,location:get('location'),notes:get('notes'),url});
     } catch(e) { errors.push('第 '+(r+1)+' 列：'+e.message); }
   }
   if (errors.length) throw new Error('發布前請修正：\n'+errors.join('\n'));
-  events.sort((a,b)=>a.date.localeCompare(b.date)||a.sort_order-b.sort_order||a.id.localeCompare(b.id));
+  // 不額外排序：events 的順序即 Google Sheet 中由上而下的列順序。
   return {schema_version:1,published_at:new Date().toISOString(),events};
 }
 function validateEvents() {
