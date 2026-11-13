@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "published_at": "2026-11-13T17:10:44.396Z",
+  "published_at": "2026-11-13T17:27:17.085Z",
   "events": [
     {
       "id": "row-0002",
@@ -11,7 +11,7 @@
       "title": "115學年度新生課程說明會",
       "location": "視訊",
       "notes": "連結另行通知",
-      "url": "",
+      "url": "https://nsysu.edu.tw",
       "audience_en": "First-year Nursing Students",
       "category_en": "Student Support",
       "title_en": "New Student Course Orientation (Academic Year 2026–2027)",
