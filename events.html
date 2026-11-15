@@ -120,19 +120,26 @@ body { margin: 0; padding: 24px 18px 36px; background: #fff; }
   border-radius: 0;
   cursor: pointer;
 }
-#nsysu-calendar-embed .calendar-table-wrap { overflow-x: auto; }
+#nsysu-calendar-embed .calendar-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
 #nsysu-calendar-embed table {
   width: 100%;
+  min-width: 1160px;
+  table-layout: fixed;
   border-collapse: collapse;
-  font-size: 15px;
+  font-size: 14px;
+  line-height: 1.55;
 }
 #nsysu-calendar-embed th,
 #nsysu-calendar-embed td {
-  padding: 11px 10px;
+  padding: 12px 10px;
   border: 1px solid var(--calendar-line);
   text-align: left;
-  vertical-align: top;
-  overflow-wrap: anywhere;
+  vertical-align: middle;
+  overflow-wrap: break-word;
 }
 #nsysu-calendar-embed th {
   background: #e9f1f6;
@@ -141,77 +148,90 @@ body { margin: 0; padding: 24px 18px 36px; background: #fff; }
   white-space: nowrap;
 }
 #nsysu-calendar-embed tbody tr:nth-child(even) { background: #f8fafc; }
-#nsysu-calendar-embed th:nth-child(1) { min-width: 148px; }
-#nsysu-calendar-embed th:nth-child(2) { min-width: 105px; }
-#nsysu-calendar-embed th:nth-child(3) { min-width: 105px; }
-#nsysu-calendar-embed th:nth-child(4) { min-width: 72px; }
-#nsysu-calendar-embed th:nth-child(5) { min-width: 255px; }
-#nsysu-calendar-embed th:nth-child(6) { min-width: 135px; }
-#nsysu-calendar-embed th:nth-child(7) { min-width: 195px; }
+/* 兩個標籤欄給固定比例，不讓長活動名稱把它們擠成直排。 */
+#nsysu-calendar-embed th:nth-child(1) { width: 12%; }
+#nsysu-calendar-embed th:nth-child(2) { width: 9%; }
+#nsysu-calendar-embed th:nth-child(3) { width: 16%; }
+#nsysu-calendar-embed th:nth-child(4) { width: 11%; }
+#nsysu-calendar-embed th:nth-child(5) { width: 25%; }
+#nsysu-calendar-embed th:nth-child(6) { width: 13%; }
+#nsysu-calendar-embed th:nth-child(7) { width: 14%; }
+#nsysu-calendar-embed td:first-child,
+#nsysu-calendar-embed td:nth-child(2) {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
 #nsysu-calendar-embed a { color: #12608c; }
 
-/* 對象＝左側年級代碼與框線；類別＝圖記與實心色塊，不單靠顏色辨識。 */
+/* 簡潔標籤：對象＝細邊框＋年級代碼；類別＝低彩度色塊＋符號。 */
 #nsysu-calendar-embed .calendar-chip {
   display: inline-flex;
-  align-items: flex-start;
-  gap: 7px;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 6px;
   max-width: 100%;
-  padding: 5px 8px;
+  min-height: 29px;
+  padding: 4px 7px;
   border-radius: 0;
   font-size: 13px;
-  line-height: 1.5;
-  font-weight: 700;
-  overflow-wrap: anywhere;
-  vertical-align: top;
+  font-weight: 600;
+  line-height: 1.45;
+  white-space: nowrap;
+  vertical-align: middle;
 }
 #nsysu-calendar-embed .calendar-chip-code {
   flex: none;
-  min-width: 25px;
-  padding-right: 7px;
+  padding-right: 6px;
   border-right: 1px solid currentColor;
-  opacity: .9;
   font-size: 11px;
-  line-height: 1.75;
-  text-align: center;
+  font-weight: 700;
+  letter-spacing: .02em;
+  line-height: 1.25;
   font-variant-numeric: tabular-nums;
 }
-#nsysu-calendar-embed .calendar-chip-label { min-width: 0; }
-#nsysu-calendar-embed .calendar-audience {
-  border: 1px solid #9ab3c7;
-  border-left: 4px solid #275d89;
-  background: #f3f8fb;
-  color: #174769;
+#nsysu-calendar-embed .calendar-chip-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-#nsysu-calendar-embed .calendar-audience[data-group="all"] { border-color: #9ac4b9; border-left-color: #17705c; background: #effaf6; color: #155a4d; }
-#nsysu-calendar-embed .calendar-audience[data-group="y1"] { border-color: #a8c3e0; border-left-color: #245d9b; background: #f0f6fd; color: #164b7d; }
-#nsysu-calendar-embed .calendar-audience[data-group="y2"] { border-color: #c0b0df; border-left-color: #6a47a6; background: #f6f2fd; color: #533486; }
-#nsysu-calendar-embed .calendar-audience[data-group="y3"] { border-color: #e2c59d; border-left-color: #9b6524; background: #fff8ed; color: #82501b; }
-#nsysu-calendar-embed .calendar-audience[data-group="y4"] { border-color: #e5b8c8; border-left-color: #a34164; background: #fef3f7; color: #86304f; }
-#nsysu-calendar-embed .calendar-audience[data-group="faculty"] { border-color: #aec2c7; border-left-color: #466b75; background: #f0f6f7; color: #31545c; }
+#nsysu-calendar-embed .calendar-audience {
+  --tag-accent: #356783;
+  color: #344d60;
+  background: #fff;
+  border: 1px solid #d0dbe4;
+  border-left: 3px solid var(--tag-accent);
+}
+#nsysu-calendar-embed .calendar-audience[data-group="all"] { --tag-accent: #237260; }
+#nsysu-calendar-embed .calendar-audience[data-group="y1"] { --tag-accent: #356d9d; }
+#nsysu-calendar-embed .calendar-audience[data-group="y2"] { --tag-accent: #765ca0; }
+#nsysu-calendar-embed .calendar-audience[data-group="y3"] { --tag-accent: #a0743b; }
+#nsysu-calendar-embed .calendar-audience[data-group="y4"] { --tag-accent: #a65870; }
+#nsysu-calendar-embed .calendar-audience[data-group="faculty"] { --tag-accent: #466b75; }
 #nsysu-calendar-embed .calendar-category {
-  border: 1px solid transparent;
-  background: #42586c;
   color: #fff;
+  background: #64748b;
+  border: 1px solid transparent;
+  font-weight: 600;
 }
 #nsysu-calendar-embed .calendar-category .calendar-chip-code {
-  min-width: 15px;
-  border-right-color: rgba(255,255,255,.5);
-  font-size: 15px;
-  line-height: 1.2;
+  padding-right: 5px;
+  border-right-color: rgba(255,255,255,.45);
+  font-size: 13px;
 }
-#nsysu-calendar-embed .calendar-category[data-group="event"] { background: #175f89; }
-#nsysu-calendar-embed .calendar-category[data-group="course"] { background: #236b4d; }
-#nsysu-calendar-embed .calendar-category[data-group="support"] { background: #844c2f; }
-#nsysu-calendar-embed .calendar-category[data-group="other"] { background: #546275; }
+#nsysu-calendar-embed .calendar-category[data-group="event"] { background: #316c8e; }
+#nsysu-calendar-embed .calendar-category[data-group="course"] { background: #42745d; }
+#nsysu-calendar-embed .calendar-category[data-group="support"] { background: #976b4c; }
+#nsysu-calendar-embed .calendar-category[data-group="other"] { background: #657386; }
 #nsysu-calendar-embed .calendar-empty {
   text-align: center;
   padding: 26px 12px;
   color: #64798a;
 }
-@media (max-width: 760px) {
+@media (max-width: 900px) {
   #nsysu-calendar-embed .calendar-filters { grid-template-columns: 1fr 1fr; }
   #nsysu-calendar-embed .calendar-search { grid-column: 1 / -1; }
   #nsysu-calendar-embed .calendar-table-wrap { overflow: visible; }
+  #nsysu-calendar-embed table { min-width: 0; table-layout: auto; font-size: 14px; }
   #nsysu-calendar-embed table,
   #nsysu-calendar-embed tbody,
   #nsysu-calendar-embed tr,
@@ -345,7 +365,7 @@ body { margin: 0; padding: 24px 18px 36px; background: #fff; }
     if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
     var weekday = new Date(s + "T00:00:00Z").getUTCDay();
     var dayNames = language === "en" ? ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"] : ["日","一","二","三","四","五","六"];
-    return s.replace(/-/g, " / ") + " (" + dayNames[weekday] + ")";
+    return s.replace(/-/g, "/") + " (" + dayNames[weekday] + ")";
   }
   function addOptions(id, items, allLabel) {
     var select=node(id), current=select.value;
@@ -370,33 +390,44 @@ body { margin: 0; padding: 24px 18px 36px; background: #fff; }
 
   function audienceTag(event) {
     var value=String(event.audience||"");
-    if (/全系|全部|所有/.test(value)) return {group:"all",code:"ALL"};
+    if (/全系|全部|所有/.test(value))
+      return {group:"all",code:"ALL",short:language==="en"?"All students":"全系"};
     var numbers=["一","二","三","四","五","六"];
     for (var i=0;i<numbers.length;i++) {
-      if(value.includes(numbers[i]+"年級")) return {group:i<4?"y"+(i+1):"other",code:"Y"+(i+1)};
+      if(value.includes(numbers[i]+"年級")) {
+        return {
+          group:i<4?"y"+(i+1):"other",
+          code:"Y"+(i+1),
+          short:language==="en"?"Year "+(i+1):numbers[i]+"年級"
+        };
+      }
     }
-    if (/教師|教職/.test(value)) return {group:"faculty",code:"FAC"};
-    return {group:"other",code:"ETC"};
+    if (/教師|教職/.test(value))
+      return {group:"faculty",code:"FAC",short:language==="en"?"Faculty":"教師"};
+    return {group:"other",code:"ETC",short:textFor(event,"audience")};
   }
   function categoryTag(event) {
     var raw=String(event.category||"");
-    if(raw==="活動") return {group:"event",code:"◆"};
-    if(raw==="課程") return {group:"course",code:"▤"};
-    if(raw==="輔導") return {group:"support",code:"◎"};
-    return {group:"other",code:"⋯"};
+    if(raw==="活動") return {group:"event",code:"◆",short:language==="en"?"Event":"活動"};
+    if(raw==="課程") return {group:"course",code:"▤",short:language==="en"?"Course":"課程"};
+    if(raw==="輔導") return {group:"support",code:"◎",short:language==="en"?"Support":"輔導"};
+    if(raw==="其他") return {group:"other",code:"·",short:language==="en"?"Other":"其他"};
+    return {group:"other",code:"·",short:textFor(event,"category")};
   }
   function addTag(cell,event,key) {
     var config=key==="audience"?audienceTag(event):categoryTag(event);
     var tag=document.createElement("span");
     tag.className="calendar-chip "+(key==="audience"?"calendar-audience":"calendar-category");
     tag.dataset.group=config.group;
+    tag.title=textFor(event,key);
+    tag.setAttribute("aria-label",textFor(event,key));
     var mark=document.createElement("span");
     mark.className="calendar-chip-code";
     mark.textContent=config.code;
     mark.setAttribute("aria-hidden","true");
     var label=document.createElement("span");
     label.className="calendar-chip-label";
-    label.textContent=textFor(event,key);
+    label.textContent=config.short;
     tag.append(mark,label);
     cell.replaceChildren(tag);
   }
