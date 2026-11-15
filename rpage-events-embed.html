@@ -191,15 +191,31 @@
 #nsysu-calendar-embed .calendar-audience[data-group="y4"] { --tag-accent: #a65870; }
 #nsysu-calendar-embed .calendar-audience[data-group="faculty"] { --tag-accent: #466b75; }
 #nsysu-calendar-embed .calendar-category {
+  width: 100%;
+  max-width: 112px;
+  min-height: 32px;
+  justify-content: flex-start;
   color: #fff;
   background: #64748b;
   border: 1px solid transparent;
   font-weight: 600;
 }
 #nsysu-calendar-embed .calendar-category .calendar-chip-code {
-  padding-right: 5px;
-  border-right-color: rgba(255,255,255,.45);
+  display: inline-flex;
+  flex: 0 0 20px;
+  width: 20px;
+  min-width: 20px;
+  height: 18px;
+  padding: 0 5px 0 0;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid rgba(255,255,255,.45);
   font-size: 13px;
+  line-height: 1;
+}
+#nsysu-calendar-embed .calendar-category .calendar-chip-label {
+  flex: 1;
+  text-align: left;
 }
 #nsysu-calendar-embed .calendar-category[data-group="event"] { background: #316c8e; }
 #nsysu-calendar-embed .calendar-category[data-group="course"] { background: #42745d; }
@@ -394,8 +410,8 @@
     if(raw==="活動") return {group:"event",code:"◆",short:language==="en"?"Event":"活動"};
     if(raw==="課程") return {group:"course",code:"▤",short:language==="en"?"Course":"課程"};
     if(raw==="輔導") return {group:"support",code:"◎",short:language==="en"?"Support":"輔導"};
-    if(raw==="其他") return {group:"other",code:"·",short:language==="en"?"Other":"其他"};
-    return {group:"other",code:"·",short:textFor(event,"category")};
+    if(raw==="其他") return {group:"other",code:"●",short:language==="en"?"Other":"其他"};
+    return {group:"other",code:"●",short:textFor(event,"category")};
   }
   function addTag(cell,event,key) {
     var config=key==="audience"?audienceTag(event):categoryTag(event);
