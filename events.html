@@ -202,10 +202,19 @@ body { margin: 0; padding: 24px 18px 36px; background: #fff; }
   border-left: 3px solid var(--tag-accent);
 }
 #nsysu-calendar-embed .calendar-audience[data-group="all"] { --tag-accent: #237260; }
+#nsysu-calendar-embed .calendar-audience[data-group="ug"] { --tag-accent: #356d9d; }
+#nsysu-calendar-embed .calendar-audience[data-group="master"] { --tag-accent: #765ca0; }
+#nsysu-calendar-embed .calendar-audience[data-group="doctoral"] { --tag-accent: #a0743b; }
 #nsysu-calendar-embed .calendar-audience[data-group="y1"] { --tag-accent: #356d9d; }
 #nsysu-calendar-embed .calendar-audience[data-group="y2"] { --tag-accent: #765ca0; }
 #nsysu-calendar-embed .calendar-audience[data-group="y3"] { --tag-accent: #a0743b; }
 #nsysu-calendar-embed .calendar-audience[data-group="y4"] { --tag-accent: #a65870; }
+#nsysu-calendar-embed .calendar-audience[data-group="m1"] { --tag-accent: #7758a3; }
+#nsysu-calendar-embed .calendar-audience[data-group="m2"] { --tag-accent: #65408c; }
+#nsysu-calendar-embed .calendar-audience[data-group="d1"] { --tag-accent: #9e6b38; }
+#nsysu-calendar-embed .calendar-audience[data-group="d2"] { --tag-accent: #855d36; }
+#nsysu-calendar-embed .calendar-audience[data-group="d3"] { --tag-accent: #9b7249; }
+#nsysu-calendar-embed .calendar-audience[data-group="d4"] { --tag-accent: #6f573d; }
 #nsysu-calendar-embed .calendar-audience[data-group="faculty"] { --tag-accent: #466b75; }
 #nsysu-calendar-embed .calendar-category {
   width: 100%;
@@ -237,6 +246,7 @@ body { margin: 0; padding: 24px 18px 36px; background: #fff; }
 #nsysu-calendar-embed .calendar-category[data-group="event"] { background: #316c8e; }
 #nsysu-calendar-embed .calendar-category[data-group="course"] { background: #42745d; }
 #nsysu-calendar-embed .calendar-category[data-group="support"] { background: #976b4c; }
+#nsysu-calendar-embed .calendar-category[data-group="admissions"] { background: #6e5e9c; }
 #nsysu-calendar-embed .calendar-category[data-group="other"] { background: #657386; }
 #nsysu-calendar-embed .calendar-empty {
   text-align: center;
@@ -322,6 +332,9 @@ body { margin: 0; padding: 24px 18px 36px; background: #fff; }
   root.dataset.initialized = "true";
   var DATA_URL = "https://bmstweb806.github.io/nsysu-calendar/data/events.json";
   var fields = ["date", "time", "audience", "category", "title", "location", "notes"];
+  // 正式分類字典，與 Google Sheets 的中英文下拉選項一致。
+  var audienceDefinitions = [{"zh":"本系全體學生","en":"All Students in the Department","code":"ALL","shortZh":"全體學生","shortEn":"All Students","group":"all"},{"zh":"本系學士班學生","en":"Undergraduate Students in the Department","code":"UG","shortZh":"學士班","shortEn":"Undergrads","group":"ug"},{"zh":"本系碩士班學生","en":"Master's Students in the Department","code":"MS","shortZh":"碩士班","shortEn":"Master's","group":"master"},{"zh":"本系博士班學生","en":"Doctoral Students in the Department","code":"PHD","shortZh":"博士班","shortEn":"Doctoral","group":"doctoral"},{"zh":"本系大一生","en":"First-year Undergraduate Students","code":"Y1","shortZh":"大一生","shortEn":"Year 1","group":"y1"},{"zh":"本系大二生","en":"Second-year Undergraduate Students","code":"Y2","shortZh":"大二生","shortEn":"Year 2","group":"y2"},{"zh":"本系大三生","en":"Third-year Undergraduate Students","code":"Y3","shortZh":"大三生","shortEn":"Year 3","group":"y3"},{"zh":"本系大四生","en":"Fourth-year Undergraduate Students","code":"Y4","shortZh":"大四生","shortEn":"Year 4","group":"y4"},{"zh":"本系碩一生","en":"First-year Master's Students","code":"M1","shortZh":"碩一生","shortEn":"Master's 1","group":"m1"},{"zh":"本系碩二生","en":"Second-year Master's Students","code":"M2","shortZh":"碩二生","shortEn":"Master's 2","group":"m2"},{"zh":"本系博一生","en":"First-year Doctoral Students","code":"D1","shortZh":"博一生","shortEn":"Doctoral 1","group":"d1"},{"zh":"本系博二生","en":"Second-year Doctoral Students","code":"D2","shortZh":"博二生","shortEn":"Doctoral 2","group":"d2"},{"zh":"本系博三生","en":"Third-year Doctoral Students","code":"D3","shortZh":"博三生","shortEn":"Doctoral 3","group":"d3"},{"zh":"本系博四生","en":"Fourth-year Doctoral Students","code":"D4","shortZh":"博四生","shortEn":"Doctoral 4","group":"d4"},{"zh":"本系教師","en":"Department Faculty","code":"FAC","shortZh":"教師","shortEn":"Faculty","group":"faculty"}];
+  var categoryDefinitions = [{"zh":"活動","en":"Events","code":"◆","shortZh":"活動","shortEn":"Event","group":"event"},{"zh":"課程","en":"Courses","code":"▤","shortZh":"課程","shortEn":"Course","group":"course"},{"zh":"輔導","en":"Student Support","code":"◎","shortZh":"輔導","shortEn":"Support","group":"support"},{"zh":"招生","en":"Admissions","code":"✦","shortZh":"招生","shortEn":"Admissions","group":"admissions"},{"zh":"其他","en":"Other","code":"●","shortZh":"其他","shortEn":"Other","group":"other"}];
   var translations = {
     zh: {
       search: "搜尋活動", placeholder: "活動、地點、備註…", audience: "對象",
@@ -383,51 +396,41 @@ body { margin: 0; padding: 24px 18px 36px; background: #fff; }
     var dayNames = language === "en" ? ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"] : ["日","一","二","三","四","五","六"];
     return s.replace(/-/g, "/") + " (" + dayNames[weekday] + ")";
   }
-  function addOptions(id, items, allLabel) {
+  function addOptions(id, definitions, allLabel) {
     var select=node(id), current=select.value;
     select.replaceChildren();
     var first=document.createElement("option");
     first.value=""; first.textContent=allLabel; select.appendChild(first);
-    var values = Array.from(new Set(items.filter(Boolean)));
-    values.sort(function (a, b) { return a.localeCompare(b, language === "en" ? "en" : "zh-Hant"); });
-    values.forEach(function (value) {
-      var option = document.createElement("option");
-      option.value = value;
-      option.textContent = value;
+    definitions.forEach(function (entry) {
+      var option=document.createElement("option");
+      option.value=entry.zh;
+      option.textContent=language==="en"?entry.en:entry.zh;
       select.appendChild(option);
     });
-    if(values.includes(current))select.value=current;
+    if(definitions.some(function(entry){return entry.zh===current;})) select.value=current;
   }
-  function refreshOptions(){
+  function refreshOptions() {
     var t=labels();
-    addOptions("audience",allEvents.map(function(e){return textFor(e,"audience");}),t.allAudience);
-    addOptions("category",allEvents.map(function(e){return textFor(e,"category");}),t.allCategory);
+    addOptions("audience",audienceDefinitions,t.allAudience);
+    addOptions("category",categoryDefinitions,t.allCategory);
   }
-
+  function findDefinition(definitions, key) {
+    return definitions.find(function(entry){return entry.zh===key;});
+  }
   function audienceTag(event) {
-    var value=String(event.audience||"");
-    if (/全系|全部|所有/.test(value))
-      return {group:"all",code:"ALL",short:language==="en"?"All students":"全系"};
-    var numbers=["一","二","三","四","五","六"];
-    for (var i=0;i<numbers.length;i++) {
-      if(value.includes(numbers[i]+"年級")) {
-        return {
-          group:i<4?"y"+(i+1):"other",
-          code:"Y"+(i+1),
-          short:language==="en"?"Year "+(i+1):numbers[i]+"年級"
-        };
-      }
-    }
-    if (/教師|教職/.test(value))
-      return {group:"faculty",code:"FAC",short:language==="en"?"Faculty":"教師"};
+    var entry=findDefinition(audienceDefinitions,String(event.audience||""));
+    if(entry) return {
+      group:entry.group,code:entry.code,
+      short:language==="en"?entry.shortEn:entry.shortZh
+    };
     return {group:"other",code:"ETC",short:textFor(event,"audience")};
   }
   function categoryTag(event) {
-    var raw=String(event.category||"");
-    if(raw==="活動") return {group:"event",code:"◆",short:language==="en"?"Event":"活動"};
-    if(raw==="課程") return {group:"course",code:"▤",short:language==="en"?"Course":"課程"};
-    if(raw==="輔導") return {group:"support",code:"◎",short:language==="en"?"Support":"輔導"};
-    if(raw==="其他") return {group:"other",code:"●",short:language==="en"?"Other":"其他"};
+    var entry=findDefinition(categoryDefinitions,String(event.category||""));
+    if(entry) return {
+      group:entry.group,code:entry.code,
+      short:language==="en"?entry.shortEn:entry.shortZh
+    };
     return {group:"other",code:"●",short:textFor(event,"category")};
   }
   function addTag(cell,event,key) {
@@ -453,8 +456,8 @@ body { margin: 0; padding: 24px 18px 36px; background: #fff; }
     var category = node("category").value;
     // filter() 保留原始順序，不進行日期或 ID 排序。
     var shown = allEvents.filter(function (event) {
-      return (!audience || textFor(event,"audience") === audience) &&
-        (!category || textFor(event,"category") === category) &&
+      return (!audience || String(event.audience||"") === audience) &&
+        (!category || String(event.category||"") === category) &&
         (!term || fields.some(function (key) {
           return textFor(event,key).toLocaleLowerCase().includes(term);
         }));
