@@ -19,7 +19,7 @@
 #nsysu-calendar-embed * { box-sizing: border-box; }
 #nsysu-calendar-embed .calendar-filters {
   display: grid;
-  grid-template-columns: 1.7fr 1fr 1fr 1fr;
+  grid-template-columns: minmax(220px, 1.7fr) minmax(160px, 1fr) minmax(160px, 1fr);
   gap: 12px;
   margin: 0 0 12px;
 }
@@ -42,7 +42,7 @@
   color: inherit;
   background: #fff;
   border: 1px solid #b8c8d3;
-  border-radius: 5px;
+  border-radius: 0;
 }
 #nsysu-calendar-embed input:focus-visible,
 #nsysu-calendar-embed select:focus-visible,
@@ -62,20 +62,12 @@
   font-size: 14px;
   color: #526879;
 }
-#nsysu-calendar-embed .calendar-actions {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-#nsysu-calendar-embed .calendar-actions label { margin: 0; white-space: nowrap; }
-#nsysu-calendar-embed .calendar-actions select { width: auto; min-width: 130px; }
 #nsysu-calendar-embed .calendar-reset {
   padding: 7px 14px;
   color: var(--calendar-blue);
   background: #fff;
   border: 1px solid #aec3d2;
-  border-radius: 5px;
+  border-radius: 0;
   cursor: pointer;
 }
 #nsysu-calendar-embed .calendar-table-wrap { overflow-x: auto; }
@@ -127,7 +119,7 @@
     background: #fff !important;
     border: 1px solid var(--calendar-line);
     border-left: 4px solid var(--calendar-blue);
-    border-radius: 7px;
+    border-radius: 0;
   }
   #nsysu-calendar-embed td {
     display: grid;
@@ -158,21 +150,10 @@
       <label for="nsysu-calendar-category">類別</label>
       <select id="nsysu-calendar-category"><option value="">全部類別</option></select>
     </div>
-    <div>
-      <label for="nsysu-calendar-year">年份</label>
-      <select id="nsysu-calendar-year"><option value="">全部年份</option></select>
-    </div>
   </div>
   <div class="calendar-tools">
     <span id="nsysu-calendar-count" class="calendar-count" role="status" aria-live="polite">正在讀取活動資料…</span>
-    <div class="calendar-actions">
-      <label for="nsysu-calendar-language">語言 / Language</label>
-      <select id="nsysu-calendar-language" aria-label="Language">
-        <option value="zh">繁體中文</option>
-        <option value="en">English</option>
-      </select>
-      <button id="nsysu-calendar-reset" class="calendar-reset" type="button">清除篩選</button>
-    </div>
+    <button id="nsysu-calendar-reset" class="calendar-reset" type="button">清除篩選</button>
   </div>
   <div class="calendar-table-wrap">
     <table aria-label="學系重要活動日程">
@@ -197,16 +178,16 @@
   var translations = {
     zh: {
       search: "搜尋活動", placeholder: "活動、地點、備註…", audience: "對象",
-      category: "類別", year: "年份", allAudience: "全部對象",
-      allCategory: "全部類別", allYear: "全部年份", clear: "清除篩選",
+      category: "類別", allAudience: "全部對象",
+      allCategory: "全部類別", clear: "清除篩選",
       loading: "正在讀取活動資料…", empty: "沒有符合篩選條件的活動",
       error: "活動資料讀取失敗：", count: function (n,total) { return "共 " + n + " 筆活動（總計 " + total + " 筆）"; },
       headers: ["活動日期","活動時間","對象","類別","活動項目","地點","備註"]
     },
     en: {
       search: "Search events", placeholder: "Event, venue, notes…", audience: "Audience",
-      category: "Category", year: "Year", allAudience: "All audiences",
-      allCategory: "All categories", allYear: "All years", clear: "Clear filters",
+      category: "Category", allAudience: "All audiences",
+      allCategory: "All categories", clear: "Clear filters",
       loading: "Loading events…", empty: "No matching events",
       error: "Unable to load events: ", count: function (n,total) { return n + " events (total " + total + ")"; },
       headers: ["Date","Time","Audience","Category","Event","Venue","Notes"]
@@ -228,12 +209,10 @@
   function applyLanguage() {
     var t = labels();
     root.setAttribute("lang", language === "en" ? "en" : "zh-Hant");
-    node("language").value = language;
     root.querySelector('label[for="nsysu-calendar-q"]').textContent = t.search;
     node("q").placeholder = t.placeholder;
     root.querySelector('label[for="nsysu-calendar-audience"]').textContent = t.audience;
     root.querySelector('label[for="nsysu-calendar-category"]').textContent = t.category;
-    root.querySelector('label[for="nsysu-calendar-year"]').textContent = t.year;
     node("reset").textContent = t.clear;
     var th = root.querySelectorAll("thead th");
     t.headers.forEach(function (h,i) { if (th[i]) th[i].textContent = h; });
@@ -266,18 +245,15 @@
     var t=labels();
     addOptions("audience",allEvents.map(function(e){return textFor(e,"audience");}),t.allAudience);
     addOptions("category",allEvents.map(function(e){return textFor(e,"category");}),t.allCategory);
-    addOptions("year",allEvents.map(function(e){return String(e.date||"").slice(0,4);}),t.allYear);
   }
   function render() {
     var term = node("q").value.trim().toLocaleLowerCase();
     var audience = node("audience").value;
     var category = node("category").value;
-    var year = node("year").value;
     // filter() 保留原始順序，不進行日期或 ID 排序。
     var shown = allEvents.filter(function (event) {
       return (!audience || textFor(event,"audience") === audience) &&
         (!category || textFor(event,"category") === category) &&
-        (!year || String(event.date).slice(0, 4) === year) &&
         (!term || fields.some(function (key) {
           return textFor(event,key).toLocaleLowerCase().includes(term);
         }));
@@ -314,20 +290,13 @@
       body.appendChild(row);
     });
   }
-  ["q", "audience", "category", "year"].forEach(function (id) {
+  ["q", "audience", "category"].forEach(function (id) {
     node(id).addEventListener(id === "q" ? "input" : "change", render);
   });
   node("reset").addEventListener("click", function () {
-    ["q", "audience", "category", "year"].forEach(function (id) { node(id).value = ""; });
+    ["q", "audience", "category"].forEach(function (id) { node(id).value = ""; });
     render();
   });
-  node("language").addEventListener("change",function(){
-    language=node("language").value;
-    node("audience").value="";
-    node("category").value="";
-    applyLanguage();
-  });
-  node("language").value=language;
   fetch(DATA_URL, { cache: "no-cache" }).then(function (response) {
     if (!response.ok) throw new Error("HTTP " + response.status);
     return response.json();
