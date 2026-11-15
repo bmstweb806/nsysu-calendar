@@ -37,7 +37,7 @@ https://docs.google.com/spreadsheets/d/1fzyEAfJw1BsyWRvVrF1VnCmQQPseMoqLOjY_3RvB
 - GAS 只會覆蓋 `data/events.json`，不會修改其他網頁。
 - 網站已存在一份初始 JSON；之後每次要反映新資料，都要按 **發布正式 JSON**。
 - RPage 需允許 `<style>`、`<script>` 與跨站 `fetch()`；若平台移除 script，資料便無法載入，需調整 RPage 編輯權限或嵌入方式。
-- **雙語自動切換**：RPage 中文網址加 `?Lang=zh-tw`，英文網址加 `?Lang=en`；嵌入程式依頁面網址自動切換中英文，不顯示語言選單。
+- **雙語切換**：RPage 中文網址 `?Lang=zh-tw`、英文網址 `?Lang=en` 會決定初始語言；若網址沒有設定則參考頁面 HTML 的 `lang`，預設中文。訪客仍可使用方正的 **「中文｜EN」按鈕** 隨時切換，無下拉選單；切換會清除舊語言的搜尋與篩選條件。
 - 介面不提供年份篩選，資料仍保留完整活動日期；「對象」使用框線和年級代碼（如 ALL、Y1、Y2），「類別」使用實心色塊及圖記（如 ◆、▤、◎），不是只靠顏色區分。
 - 所有控制元件和行動版活動卡片均使用方角（無圓角）。
 - 獨立頁面也支援 `https://bmstweb806.github.io/nsysu-calendar/events.html?Lang=en`。
