@@ -79,6 +79,39 @@ body { margin: 0; padding: 24px 18px 36px; background: #fff; }
   font-size: 14px;
   color: #526879;
 }
+
+#nsysu-calendar-embed .calendar-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+#nsysu-calendar-embed .calendar-language-switch {
+  display: inline-flex;
+  border: 1px solid #174f72;
+  border-radius: 0;
+  overflow: hidden;
+}
+#nsysu-calendar-embed .calendar-language-switch button {
+  padding: 7px 13px;
+  min-width: 64px;
+  border: 0;
+  border-radius: 0;
+  background: #fff;
+  color: #174f72;
+  cursor: pointer;
+  font-weight: 700;
+}
+#nsysu-calendar-embed .calendar-language-switch button + button {
+  border-left: 1px solid #174f72;
+}
+#nsysu-calendar-embed .calendar-language-switch button[aria-pressed="true"] {
+  background: #174f72;
+  color: #fff;
+}
+#nsysu-calendar-embed .calendar-language-switch button:hover:not([aria-pressed="true"]) {
+  background: #e9f1f6;
+}
 #nsysu-calendar-embed .calendar-reset {
   padding: 7px 14px;
   color: var(--calendar-blue);
@@ -224,7 +257,14 @@ body { margin: 0; padding: 24px 18px 36px; background: #fff; }
   </div>
   <div class="calendar-tools">
     <span id="nsysu-calendar-count" class="calendar-count" role="status" aria-live="polite">正在讀取活動資料…</span>
-    <button id="nsysu-calendar-reset" class="calendar-reset" type="button">清除篩選</button>
+
+    <div class="calendar-actions">
+      <div class="calendar-language-switch" role="group" aria-label="語言切換 / Language">
+        <button id="nsysu-calendar-zh" type="button" lang="zh-Hant" aria-pressed="true">中文</button>
+        <button id="nsysu-calendar-en" type="button" lang="en" aria-pressed="false">EN</button>
+      </div>
+      <button id="nsysu-calendar-reset" class="calendar-reset" type="button">清除篩選</button>
+    </div>
   </div>
   <div class="calendar-table-wrap">
     <table aria-label="學系重要活動日程">
@@ -266,8 +306,10 @@ body { margin: 0; padding: 24px 18px 36px; background: #fff; }
   };
   var params = new URLSearchParams(window.location.search);
   var requestedLanguage = params.get("Lang") || params.get("lang") || "";
-  var language = /^en([_-]|$)/i.test(requestedLanguage) ? "en" : "zh";
+  var fallbackLanguage = document.documentElement.getAttribute("lang") || "";
+  var language = /^en([_-]|$)/i.test(requestedLanguage || fallbackLanguage) ? "en" : "zh";
   var allEvents = [];
+  var loaded = false;
   function node(id) { return root.querySelector("#nsysu-calendar-" + id); }
   function textFor(event, key) {
     if (language === "en" && ["audience","category","title","location","notes"].includes(key)) {
@@ -280,6 +322,13 @@ body { margin: 0; padding: 24px 18px 36px; background: #fff; }
   function applyLanguage() {
     var t = labels();
     root.setAttribute("lang", language === "en" ? "en" : "zh-Hant");
+    node("zh").setAttribute("aria-pressed",String(language === "zh"));
+    node("en").setAttribute("aria-pressed",String(language === "en"));
+    var pageHeading=document.getElementById("nsysu-calendar-page-heading");
+    if(pageHeading) {
+      pageHeading.textContent=language==="en"?"Department Events":"學系重要活動日程";
+      document.documentElement.lang=language==="en"?"en":"zh-Hant";
+    }
     root.querySelector('label[for="nsysu-calendar-q"]').textContent = t.search;
     node("q").placeholder = t.placeholder;
     root.querySelector('label[for="nsysu-calendar-audience"]').textContent = t.audience;
@@ -288,7 +337,8 @@ body { margin: 0; padding: 24px 18px 36px; background: #fff; }
     var th = root.querySelectorAll("thead th");
     t.headers.forEach(function (h,i) { if (th[i]) th[i].textContent = h; });
     refreshOptions();
-    render();
+    if (loaded) render();
+    else node("count").textContent = t.loading;
   }
   function dateText(value) {
     var s = String(value || "");
@@ -405,12 +455,23 @@ body { margin: 0; padding: 24px 18px 36px; background: #fff; }
     ["q", "audience", "category"].forEach(function (id) { node(id).value = ""; });
     render();
   });
+  function selectLanguage(nextLanguage) {
+    if (language === nextLanguage) return;
+    language = nextLanguage;
+    // 避免原本中文的搜尋文字或篩選值影響英文結果（反之亦然）。
+    ["q", "audience", "category"].forEach(function (id) { node(id).value = ""; });
+    applyLanguage();
+  }
+  node("zh").addEventListener("click",function(){ selectLanguage("zh"); });
+  node("en").addEventListener("click",function(){ selectLanguage("en"); });
+  applyLanguage();
   fetch(DATA_URL, { cache: "no-cache" }).then(function (response) {
     if (!response.ok) throw new Error("HTTP " + response.status);
     return response.json();
   }).then(function (data) {
     if (!data || !Array.isArray(data.events)) throw new Error("JSON 格式不符");
     allEvents = data.events.filter(function (event) { return event && event.date && event.title; });
+    loaded = true;
     applyLanguage();
   }).catch(function (error) {
     node("count").textContent = labels().error + error.message;
@@ -419,14 +480,5 @@ body { margin: 0; padding: 24px 18px 36px; background: #fff; }
 }());
 </script>
 
-<script>
-(function(){
-  var requested=new URLSearchParams(window.location.search).get("Lang")||new URLSearchParams(window.location.search).get("lang")||"";
-  var en=/^en([_-]|$)/i.test(requested);
-  var heading=document.getElementById("nsysu-calendar-page-heading");
-  if(heading)heading.textContent=en?"Department Events":"學系重要活動日程";
-  document.documentElement.lang=en?"en":"zh-Hant";
-})();
-</script>
 </body>
 </html>
